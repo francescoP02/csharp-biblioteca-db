@@ -153,23 +153,56 @@ SqlConnection connessioneSql = new SqlConnection(stringaDiConnessione);
 
     void RequireLoan()
     {
-        Console.Write("Insert name: ");
-        string name = Console.ReadLine();
 
-        Console.Write("Insert surname: ");
-        string surname = Console.ReadLine();
+        Console.WriteLine("Do you have an account? (y/n)");
+    string choice = Console.ReadLine();
+    switch (choice)
+    {
+        case ("y"):
 
-        Console.Write("Insert email: ");
-        string email = Console.ReadLine();
+            break;
+        case("n"):
+            try
+            {
+                connessioneSql.Open();
 
-        Console.Write("Insert password: ");
-        string password = Console.ReadLine();
+                string query = "INSERT INTO Users (Name, Surname, Email, Password, Phone) VALUES (@dato1, @dato2, @dato3, @dato4, @dato5)";
 
-        Console.Write("Insert phone number: ");
-        string phone = Console.ReadLine();
+                SqlCommand cmd = new SqlCommand(query, connessioneSql);
+                Console.Write("Insert name: ");
+                string username = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato1", username));
 
-        User newUser = new User(name, surname, email, password, phone);
-        registeredUser.Add(newUser);
+                Console.Write("Insert surname: ");
+                string usersurname = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato2", usersurname));
+
+                Console.Write("Insert email: ");
+                string useremail = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato3", useremail));
+
+                Console.Write("Insert password: ");
+                string userpassword = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato4", userpassword));
+
+                Console.Write("Insert phone number: ");
+                string userphone = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato5", userphone));
+
+                int affectedRows = cmd.ExecuteNonQuery();
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                finally
+                {
+                    connessioneSql.Close();
+                }
+            break;
+    }
+        
 
         Console.WriteLine("Which document you want to loan? (insert title)");
 
@@ -184,11 +217,11 @@ SqlConnection connessioneSql = new SqlConnection(stringaDiConnessione);
 
                     success = true;
 
-                    Loan newLoan = new Loan("20/09/2022", "21/09/2022", newUser, documento);
+                    //Loan newLoan = new Loan("20/09/2022", "21/09/2022", newUser, documento);
 
-                    loans.Add(newLoan);
+                    //loans.Add(newLoan);
 
-                    Console.WriteLine("Mr. " + newLoan.Utente.Surname + " have completed the loan request for the document: " + newLoan.Documento.Title);
+                    //Console.WriteLine("Mr. " + newLoan.Utente.Surname + " have completed the loan request for the document: " + newLoan.Documento.Title);
                 }
             }
         }

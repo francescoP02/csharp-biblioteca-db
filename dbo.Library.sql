@@ -1,4 +1,14 @@
-﻿CREATE TABLE [dbo].[Books]
+﻿CREATE TABLE [dbo].[Users]
+(
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
+	[Name] VARCHAR(50) NOT NULL,
+	[Surname] VARCHAR(50),
+	[Email] VARCHAR(50) NOT NULL,
+	[Password] VARCHAR(50) NOT NULL,
+	[Phone] VARCHAR(50)
+)
+
+CREATE TABLE [dbo].[Books]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY,
 	[Isbn] VARCHAR(50) NOT NULL,
