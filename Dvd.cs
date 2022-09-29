@@ -32,7 +32,7 @@ public class Dvd : Document
     public string SerialNumber { get; set; }
     public int Time { get; set; }
 
-    public Dvd(string serialNumber, int time, string title, int year, string genre, bool available, string shelf, string author) : base(title, year, genre, available, shelf, author)
+    public Dvd(string serialNumber, int time, string title, int year, string genre, int available, string shelf, string author) : base(title, year, genre, available, shelf, author)
     {
         SerialNumber = serialNumber;
         Time = time;

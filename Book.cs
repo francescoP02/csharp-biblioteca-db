@@ -34,7 +34,7 @@ public class Book : Document
     private string ISBN {get;set;}
     private int Pages { get; set; }
 
-    public Book(string isbn, string title, int pages, int year, string genre, bool available, string shelf, string author) : base(title, year, genre, available, shelf, author)
+    public Book(string isbn, string title, int pages, int year, string genre, int available, string shelf, string author) : base(title, year, genre, available, shelf, author)
     {
         ISBN = isbn;
         Pages = pages;

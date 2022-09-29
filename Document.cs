@@ -29,11 +29,11 @@ public class Document
     public string Title { get; set; }
     public int Year { get; set; }
     public string Genre { get; set; }
-    public bool Available { get; set; }
+    public int Available { get; set; }
     public string Shelf { get; set; }
     public string Author { get; set; }
 
-    public Document(string title, int year, string genre, bool available, string shelf, string author)
+    public Document(string title, int year, string genre, int available, string shelf, string author)
     {
         Title = title;
         Year = year;

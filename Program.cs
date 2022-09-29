@@ -1,163 +1,224 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 using System.Reflection.Metadata;
+using System.Data.SqlClient;
 
-List<User> registeredUser = new List<User>();
-List<Document> documents = new List<Document>();
-List<Loan> loans = new List<Loan>();
 
-//some books
+string stringaDiConnessione = "Data Source=localhost;Initial Catalog=db-biblioteca;Integrated Security=True";
+SqlConnection connessioneSql = new SqlConnection(stringaDiConnessione);
 
-documents.Add(new Book("1234567", "Prova", 100, 2002, "fantasy", true, "12345", "Rowling"));
-documents.Add(new Book("1234566", "Prova2", 200, 2003, "horro", true, "12344", "Rowling"));
-documents.Add(new Book("1234565", "Prova3", 300, 2004, "fantasy", true, "12346", "Rowling"));
 
-//some dvds
+    List<User> registeredUser = new List<User>();
+    List<Document> documents = new List<Document>();
+    List<Loan> loans = new List<Loan>();
 
-documents.Add(new Dvd("12345", 100, "dvd-prova", 2022, "pop", true, "12345A", "Bob"));
-documents.Add(new Dvd("123456", 120, "dvd-prova2", 2022, "rock", true, "12345B", "Bob"));
-documents.Add(new Dvd("123457", 150, "dvd-prova3", 2022, "jazz", true, "12345C", "Bob"));
+    bool success = false;
+    string choice;
 
-//some users
+    Random rnd = new Random();
 
-registeredUser.Add(new User("Prova", "Rossi", "rossi@gmail.com", "12345a", "3331112233"));
-registeredUser.Add(new User("Prova", "Gialli", "gialli@gmail.com", "12345b", "3332221133"));
-registeredUser.Add(new User("Prova", "Verdi", "verdi@gmail.com", "12345c", "3333332211"));
-
-bool success = false;
-string choice;
-
-Random rnd = new Random();
-
-do
-{
-    Console.WriteLine("What do you want to do?");
-    Console.WriteLine("'add' for add a document, 'loan' for loan a document");
-    Console.WriteLine("'search' for search a loan, 'exit' for ending process");
-    choice = Console.ReadLine();
-
-    if (choice == "add")
+    do
     {
-        InsertDocument();
-    }
-    else if (choice == "loan")
-    {
-        RequireLoan();
-    }
-    else if (choice == "search")
-    {
-        SearchLoan();
-    }
+        Console.WriteLine("What do you want to do?");
+        Console.WriteLine("'add' for add a document, 'loan' for loan a document");
+        Console.WriteLine("'search' for search a loan, 'exit' for ending process");
+        choice = Console.ReadLine();
 
-} while (choice != "exit");
-
-void InsertDocument()
-{
-    Console.WriteLine("Book or Dvd?");
-    string response = Console.ReadLine();
-
-    Console.WriteLine("Insert title:");
-    string title = Console.ReadLine();
-
-    Console.WriteLine("Insert author:");
-    string author = Console.ReadLine();
-
-    Console.WriteLine("Insert year:");
-    int year = Convert.ToInt32(Console.ReadLine());
-
-    Console.WriteLine("Insert genre:");
-    string genre = Console.ReadLine();
-
-    string shelf = $"A{Convert.ToString(rnd.Next(1000))}";
-
-    bool available = true;
-
-    if (response == "Book")
-    {
-        Console.WriteLine("Insert page number:");
-        int pages = Convert.ToInt32(Console.ReadLine());
-        string isbn = Convert.ToString(rnd.Next(99999999));
-        Book book = new Book(isbn, title, pages, year, genre, available, shelf, author);
-        documents.Add(book);
-    }
-
-    else if (response == "Dvd")
-    {
-        Console.WriteLine("Insert duration:");
-        int time = Convert.ToInt32(Console.ReadLine());
-        string serialNumber = Convert.ToString(rnd.Next(99999999));
-        Dvd dvd = new Dvd(serialNumber, time, title, year, genre, available, shelf, author);
-        documents.Add(dvd);
-    }
-}
-
-void RequireLoan()
-{
-    Console.Write("Insert name: ");
-    string name = Console.ReadLine();
-
-    Console.Write("Insert surname: ");
-    string surname = Console.ReadLine();
-
-    Console.Write("Insert email: ");
-    string email = Console.ReadLine();
-
-    Console.Write("Insert password: ");
-    string password = Console.ReadLine();
-
-    Console.Write("Insert phone number: ");
-    string phone = Console.ReadLine();
-
-    User newUser = new User(name, surname, email, password, phone);
-    registeredUser.Add(newUser);
-
-    Console.WriteLine("Which document you want to loan? (insert title)");
-
-    string userInput = Console.ReadLine();
-
-    foreach (Document documento in documents)
-    {
-        if (documento.Title == userInput)
+        if (choice == "add")
         {
-            if (documento.Available == true)
+            InsertDocument();
+        }
+        else if (choice == "loan")
+        {
+            RequireLoan();
+        }
+        else if (choice == "search")
+        {
+            SearchLoan();
+        }
+
+    } while (choice != "exit");
+
+    void InsertDocument()
+    {
+        Console.WriteLine("Book or Dvd?");
+        string response = Console.ReadLine();
+
+        if (response == "Book")
+        {
+
+            try
             {
+                connessioneSql.Open();
 
-                success = true;
+                string query = "INSERT INTO Books (Isbn, Title, Pages, Year, Genre, Available, Shelf, Author) VALUES (@dato1, @dato2, @dato3, @dato4, @dato5, @dato6, @dato7, @dato8)";
 
-                Loan newLoan = new Loan("20/09/2022", "21/09/2022", newUser, documento);
+                SqlCommand cmd = new SqlCommand(query, connessioneSql);
 
-                loans.Add(newLoan);
+                string userisbn = Convert.ToString(rnd.Next(99999999));
+                cmd.Parameters.Add(new SqlParameter("@dato1", userisbn));
 
-                Console.WriteLine("Mr. " + newLoan.Utente.Surname + " have completed the loan request for the document: " + newLoan.Documento.Title);
+                Console.WriteLine("Insert title:");
+                string usertitle = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato2", usertitle));
+
+                Console.WriteLine("Insert page number:");
+                int userpages = Convert.ToInt32(Console.ReadLine());
+                cmd.Parameters.Add(new SqlParameter("@dato3", userpages));
+
+                Console.WriteLine("Insert year:");
+                int useryear = Convert.ToInt32(Console.ReadLine());
+                cmd.Parameters.Add(new SqlParameter("@dato4", useryear));
+
+                Console.WriteLine("Insert genre:");
+                string usergenre = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato5", usergenre));
+
+                int useravailable = 1;
+                cmd.Parameters.Add(new SqlParameter("@dato6", useravailable));
+
+                string usershelf = $"A{Convert.ToString(rnd.Next(1000))}";
+                cmd.Parameters.Add(new SqlParameter("@dato7", usershelf));
+
+                Console.WriteLine("Insert author:");
+                string userauthor = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato8", userauthor));
+
+                int affectedRows = cmd.ExecuteNonQuery();
+
+                //Book book = new Book(userisbn, usertitle, userpages, useryear, usergenre, useravailable, usershelf, userauthor);
+                //documents.Add(book);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                connessioneSql.Close();
+            }
+        }
+
+        else if (response == "Dvd")
+        {
+            try
+            {
+                connessioneSql.Open();
+
+                string query = "INSERT INTO DVDs (SerialNumber, Time, Title, Year, Genre, Available, Shelf, Author) VALUES (@dato1, @dato2, @dato3, @dato4, @dato5, @dato6, @dato7, @dato8)";
+
+                SqlCommand cmd = new SqlCommand(query, connessioneSql);
+
+                string userserialNumber = Convert.ToString(rnd.Next(99999999));
+                cmd.Parameters.Add(new SqlParameter("@dato1", userserialNumber));
+
+                Console.WriteLine("Insert duration:");
+                int usertime = Convert.ToInt32(Console.ReadLine());
+                cmd.Parameters.Add(new SqlParameter("@dato2", usertime));
+
+                Console.WriteLine("Insert title:");
+                string usertitle = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato3", usertitle));
+
+                Console.WriteLine("Insert year:");
+                int useryear = Convert.ToInt32(Console.ReadLine());
+                cmd.Parameters.Add(new SqlParameter("@dato4", useryear));
+
+                Console.WriteLine("Insert genre:");
+                string usergenre = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato5", usergenre));
+
+                int useravailable = 1;
+                cmd.Parameters.Add(new SqlParameter("@dato6", useravailable));
+
+                string usershelf = $"A{Convert.ToString(rnd.Next(1000))}";
+                cmd.Parameters.Add(new SqlParameter("@dato7", usershelf));
+
+                Console.WriteLine("Insert author:");
+                string userauthor = Console.ReadLine();
+                cmd.Parameters.Add(new SqlParameter("@dato8", userauthor));
+
+                int affectedRows = cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                connessioneSql.Close();
             }
         }
     }
 
-    if (success != true)
+    void RequireLoan()
     {
-        Console.WriteLine("No available");
-    }
-}
+        Console.Write("Insert name: ");
+        string name = Console.ReadLine();
 
-void SearchLoan()
-{
-    bool found = false;
-    Console.WriteLine("Insert user's surname:");
-    string userSurname = Console.ReadLine();
+        Console.Write("Insert surname: ");
+        string surname = Console.ReadLine();
 
-    foreach (Loan loan in loans)
-    {
-        if (loan.Utente.Surname == userSurname)
+        Console.Write("Insert email: ");
+        string email = Console.ReadLine();
+
+        Console.Write("Insert password: ");
+        string password = Console.ReadLine();
+
+        Console.Write("Insert phone number: ");
+        string phone = Console.ReadLine();
+
+        User newUser = new User(name, surname, email, password, phone);
+        registeredUser.Add(newUser);
+
+        Console.WriteLine("Which document you want to loan? (insert title)");
+
+        string userInput = Console.ReadLine();
+
+        foreach (Document documento in documents)
         {
-            found = true;
-            Console.WriteLine($"Loaned document: {loan.Documento.Title}");
+            if (documento.Title == userInput)
+            {
+                if (documento.Available == 1)
+                {
+
+                    success = true;
+
+                    Loan newLoan = new Loan("20/09/2022", "21/09/2022", newUser, documento);
+
+                    loans.Add(newLoan);
+
+                    Console.WriteLine("Mr. " + newLoan.Utente.Surname + " have completed the loan request for the document: " + newLoan.Documento.Title);
+                }
+            }
+        }
+
+        if (success != true)
+        {
+            Console.WriteLine("No available");
         }
     }
 
-    if (found == false)
+    void SearchLoan()
     {
-        Console.WriteLine("No loan founded");
+        bool found = false;
+        Console.WriteLine("Insert user's surname:");
+        string userSurname = Console.ReadLine();
+
+        foreach (Loan loan in loans)
+        {
+            if (loan.Utente.Surname == userSurname)
+            {
+                found = true;
+                Console.WriteLine($"Loaned document: {loan.Documento.Title}");
+            }
+        }
+
+        if (found == false)
+        {
+            Console.WriteLine("No loan founded");
+        }
+
     }
 
-}
 
